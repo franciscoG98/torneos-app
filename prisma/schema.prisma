@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // provider = "postgresql"
+  url      = "file:./dev.db"
+}
+
+model Jugador {
+  id       String    @id @default(cuid())
+  nombre   String
+  apellido String
+  dni      String?   @unique
+  parejas1 Pareja[]  @relation("Jugador1")
+  parejas2 Pareja[]  @relation("Jugador2")
+  ranking  Ranking[]
+}
+
+model Pareja {
+  id         String    @id @default(cuid())
+  jugador1   Jugador   @relation("Jugador1", fields: [jugador1Id], references: [id])
+  jugador1Id String
+  jugador2   Jugador   @relation("Jugador2", fields: [jugador2Id], references: [id])
+  jugador2Id String
+  categoria  String
+  torneo     Torneo?   @relation(fields: [torneoId], references: [id])
+  torneoId   String?
+  zonas      Zona[]
+  partidos1  Partido[] @relation("Pareja1")
+  partidos2  Partido[] @relation("Pareja2")
+}
+
+model Torneo {
+  id                   String                @id @default(cuid())
+  nombre               String
+  deporte              String
+  fechaInicio          DateTime
+  fechaFin             DateTime
+  categorias           String
+  cantidadCanchas      Int
+  estado               String
+  parejas              Pareja[]
+  zonas                Zona[]
+  partidos             Partido[]
+  configuracionPuntaje ConfiguracionPuntaje?
+  rankings             Ranking[]
+}
+
+model Zona {
+  id       String    @id @default(cuid())
+  nombre   String
+  torneo   Torneo    @relation(fields: [torneoId], references: [id])
+  torneoId String
+  parejas  Pareja[]
+  partidos Partido[]
+}
+
+model Partido {
+  id               String     @id @default(cuid())
+  cancha           Int
+  fecha            DateTime
+  horaInicio       String
+  horaFin          String?
+  pareja1          Pareja     @relation("Pareja1", fields: [pareja1Id], references: [id])
+  pareja1Id        String
+  pareja2          Pareja     @relation("Pareja2", fields: [pareja2Id], references: [id])
+  pareja2Id        String
+  deporte          String
+  categoria        String
+  zona             Zona?      @relation(fields: [zonaId], references: [id])
+  zonaId           String?
+  faseEliminatoria String?
+  resultado        Resultado?
+
+  Torneo Torneo[]
+}
+
+model Resultado {
+  id            String  @id @default(cuid())
+  partido       Partido @relation(fields: [partidoId], references: [id])
+  partidoId     String  @unique
+  ganador       String
+  puntosPareja1 Int
+  puntosPareja2 Int
+  detalle       String?
+}
+
+model ConfiguracionPuntaje {
+  id            String @id @default(cuid())
+  torneo        Torneo @relation(fields: [torneoId], references: [id])
+  torneoId      String @unique
+  participacion Int
+  cuartoPuesto  Int
+  tercerPuesto  Int
+  segundoPuesto Int
+  primerPuesto  Int
+}
+
+model Ranking {
+  id        String  @id @default(cuid())
+  jugador   Jugador @relation(fields: [jugadorId], references: [id])
+  jugadorId String
+  torneo    Torneo  @relation(fields: [torneoId], references: [id])
+  torneoId  String
+  categoria String
+  puntos    Int
+}
