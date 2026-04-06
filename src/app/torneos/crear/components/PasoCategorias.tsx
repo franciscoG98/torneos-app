@@ -21,6 +21,7 @@ const PasoCategorias = () => {
       id: Date.now().toString(),
       nombre: categoriaNombre,
       tipoPuntaje,
+      zonas: [],
     };
 
     dispatch({

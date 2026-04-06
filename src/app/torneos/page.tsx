@@ -1,7 +1,7 @@
 'use client'
 
 import { useTorneo } from '@/context/torneoContext';
-import { Partido } from '@/types/torneo';
+import { Pareja, Partido } from '@/types/torneo';
 
 const Torneos = () => {
   const { state, dispatch } = useTorneo();

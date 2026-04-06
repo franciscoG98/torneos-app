@@ -1,13 +1,15 @@
-export const generarZonas = (cat, cantidadDeZonas, parejasPorZona) => {
+import { Pareja, Zona } from "@/types/torneo"
+
+export const generarZonas = (cat: string, cantidadDeZonas: number, parejasPorZona: number): { zonas: Zona[] } => {
   const parejasInscriptas = parejasPorZona * cantidadDeZonas
-  const parejas = []
+  const parejas: Pareja[] = []
 
   for (let i = 0; i < parejasInscriptas; i++) {
     parejas.push({
       id: crypto.randomUUID(),
       jugador1: `jugador ${i}`,
       jugador2: `jugador ${i}`,
-      categoria: cat
+      categoriaId: cat
     })
   }
 

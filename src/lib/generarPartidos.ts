@@ -1,5 +1,7 @@
-export const generarPartidos = (torneo) => {
-  const partidos = []
+import { Partido } from "@/types/torneo"
+
+export const generarPartidos = (torneo: any): Partido[] => {
+  const partidos: Partido[] = []
   let partidoIndex = 0
 
   // Recorrer categorias

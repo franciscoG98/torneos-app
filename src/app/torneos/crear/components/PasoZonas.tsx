@@ -9,7 +9,7 @@ import { generarZonas } from '@/lib/generarZonas';
 export default function PasoZonas() {
   const { state, dispatch } = useTorneo();
 
-  const [configuraciones, setConfiguraciones] = useState<Record<string, { zonas: number; parejasPorZona: number, categoria: Categoria }>>({});
+  const [configuraciones, setConfiguraciones] = useState<Record<string, { zonas: number; parejasPorZona: number, categoria: string }>>({});
 
   function handleChange(name: string, field: 'zonas' | 'parejasPorZona', value: number) {
     setConfiguraciones(prev => ({
@@ -24,11 +24,10 @@ export default function PasoZonas() {
   const generarParejas = () => {
     const data = configuraciones
 
-    const aux = []
+    const aux: { zonas: number; parejasPorZona: number; categoria: string }[] = [];
 
     Object.keys(data).map((key, idx) => {
-      aux[idx] = data[key];
-      aux[idx].categoria = key;
+      aux[idx] = { ...data[key], categoria: key };
     });
 
     let zonas = []

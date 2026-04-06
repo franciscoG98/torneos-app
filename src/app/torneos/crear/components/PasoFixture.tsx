@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTorneo } from '@/context/torneoContext';
-import { Partido, Zona } from '@/types/torneo';
+import { Partido, Zona, Pareja } from '@/types/torneo';
 import { generarPartidos } from '@/lib/generarPartidos';
 import WizardBtn from "../ui/WizardBtn";
 
@@ -10,8 +10,8 @@ const PasoFixture = () => {
   const { state, dispatch } = useTorneo();
 
   const [loading, setLoading] = useState(false);
-  const [fixture, setFixture] = useState(null);
-  const [zonas, setZonas] = useState<Zona[]>([]);
+  const [fixture, setFixture] = useState<Partido[] | null>(null);
+  const [zonas, setZonas] = useState<{ zonas: Zona[] }[]>([]);
 
   useEffect(() => {
     setZonas(state.zonas)
