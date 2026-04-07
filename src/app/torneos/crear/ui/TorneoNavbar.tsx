@@ -1,7 +1,8 @@
 "use client"
 
-import { useTorneo } from "@/context/torneoContext";
 import React from "react"
+import { useTorneo } from "@/context/torneoContext";
+import { Button } from "@/components/ui/button"
 
 const steps = [
   {

@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTorneo } from "@/context/torneoContext";
 import { CrearTorneoInput } from "@/types/wizard";
 import WizardBtn from "../ui/WizardBtn";
 
+function formatDateForInput(value: Date | string | undefined): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value.slice(0, 10);
+  const y = value.getFullYear();
+  const m = String(value.getMonth() + 1).padStart(2, "0");
+  const d = String(value.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 const PasoDatosTorneo = () => {
   const { state, dispatch } = useTorneo();
+  const [datesReady, setDatesReady] = useState(false);
   const [torneoData, setTorneoData] = useState<CrearTorneoInput>({
     nombre: state.torneo.nombre,
     deporte: state.torneo.deporte,
@@ -15,6 +25,16 @@ const PasoDatosTorneo = () => {
     cantidadCanchas: state.torneo.cantidadCanchas,
     categorias: [],
   });
+
+  useEffect(() => {
+    const today = new Date();
+    setTorneoData((prev) => ({
+      ...prev,
+      fechaInicio: today,
+      fechaFin: today,
+    }));
+    setDatesReady(true);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -91,7 +111,7 @@ const PasoDatosTorneo = () => {
             type="date"
             name="fechaInicio"
             id="fechaInicio"
-            value={torneoData.fechaInicio?.toString().slice(0, 10)}
+            value={datesReady ? formatDateForInput(torneoData.fechaInicio) : ""}
             onChange={handleChange}
             className="mt-1 p-2 border rounded-md border-gray-300"
           />
@@ -104,7 +124,7 @@ const PasoDatosTorneo = () => {
             type="date"
             name="fechaFin"
             id="fechaFin"
-            value={torneoData.fechaFin?.toString().slice(0, 10)}
+            value={datesReady ? formatDateForInput(torneoData.fechaFin) : ""}
             onChange={handleChange}
             className="mt-1 p-2 border rounded-md border-gray-300"
           />

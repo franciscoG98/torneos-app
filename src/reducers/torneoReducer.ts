@@ -4,8 +4,8 @@ export const initialState: TorneoState = {
   torneo: {
     nombre: "",
     deporte: "paddle",
-    fechaInicio: new Date(),
-    fechaFin: new Date(),
+    fechaInicio: new Date(0),
+    fechaFin: new Date(0),
     cantidadCanchas: 1,
     estado: "borrador",
   },
