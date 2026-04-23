@@ -3,7 +3,7 @@ import TorneoNavbar from './crear/ui/TorneoNavbar'
 
 const TorneosLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <section>
+    <section className="torneos-layout">
       <TorneoNavbar />
       {children}
     </section>

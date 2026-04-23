@@ -1,34 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTorneo } from '@/context/torneoContext';
-import { Partido, Zona, Pareja } from '@/types/torneo';
-import { generarPartidos } from '@/lib/generarPartidos';
+import { Pareja } from '@/types/torneo';
+import { conteoPartidosPorCategoria, generarPartidos } from '@/lib/generarPartidos';
+import { isWizardStepComplete } from '@/lib/torneoWizardValidation';
 import WizardBtn from "../ui/WizardBtn";
+import TablaPartidos from './TablaPartidos';
+import TablaPosicionesZona from './TablaPosicionesZona';
 
 const PasoFixture = () => {
   const { state, dispatch } = useTorneo();
+  const zonas = state.zonas;
+  const partidos = state.partidos;
 
   const [loading, setLoading] = useState(false);
-  const [fixture, setFixture] = useState<Partido[] | null>(null);
-  const [zonas, setZonas] = useState<{ zonas: Zona[] }[]>([]);
-
-  useEffect(() => {
-    setZonas(state.zonas)
-  }, [state.zonas]);
-
 
   const handleGenerarFixture = async () => {
     setLoading(true);
 
     try {
-      const partidos = generarPartidos(zonas)
-      console.log('dumb partidos', partidos);
-      setFixture(partidos)
-
+      const generados = generarPartidos(state.zonas);
       dispatch({
         type: 'SET_PARTIDOS',
-        payload: partidos,
+        payload: generados,
       });
     } catch (error) {
       console.error('Error al generar fixture:', error);
@@ -43,8 +38,11 @@ const PasoFixture = () => {
   };
 
   const handleNext = () => {
+    if (!isWizardStepComplete(3, state)) return;
     dispatch({ type: "SET_STEP", payload: state.step + 1 });
   };
+
+  const nextDisabled = !isWizardStepComplete(3, state);
 
   return (
     // TODO changing md:mx-32 for sm:mx-32 looks great
@@ -52,9 +50,17 @@ const PasoFixture = () => {
       <h2 className="text-4xl text-center font-bold mt-8">Previsualizar Fixture</h2>
 
       <h3 className="text-3xl text-center font-semibold">Zonas</h3>
-      {zonas.map((categoria, idx) => (
+      {zonas.map((categoria, idx) => {
+        const catId = categoria.zonas[0]?.categoriaId;
+        const conteo = catId ? conteoPartidosPorCategoria(partidos, catId) : null;
+        return (
         <div key={idx} className='w-screen sm:w-full'>
-          <h4 className='text-center font-semibold text-2xl mb-2'>{categoria.zonas[0].categoriaId}</h4>
+          <h4 className='text-center font-semibold text-2xl mb-1'>{catId ?? '—'}</h4>
+          {conteo && conteo.zona + conteo.eliminacion > 0 ? (
+            <p className="text-center text-sm text-neutral-600 mb-2">
+              Zona: {conteo.zona} partidos · Eliminación: {conteo.eliminacion} partidos
+            </p>
+          ) : null}
 
           {/* zonas */}
           <div className='flex flex-col sm:flex-row sm:flex-wrap sm:justify-around gap-4'>
@@ -98,52 +104,32 @@ const PasoFixture = () => {
                     ))}
                   </tbody>
                 </table>
+                <TablaPosicionesZona
+                  parejas={zona.parejas}
+                  zonaId={zona.id}
+                  partidos={partidos}
+                />
               </div>
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
 
       <button onClick={handleGenerarFixture} disabled={loading} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
         {loading ? 'Generando...' : 'Generar Fixture'}
       </button>
 
-      {fixture && (
-        <div>
-          <h3 className='text-center text-xl font-semibold my-2'>Listado de Partidos</h3>
-
-          <table className="min-w-full divide-y divide-gray-200 flex flex-col border rounded">
-            <thead className="bg-gray-700 text-white">
-              <tr className="flex justify-around py-2 items-center font-medium">
-                <th className="flex whitespace-nowrap p-1 mr-4">#</th>
-                <th className="flex whitespace-nowrap p-1">Cat</th>
-                <th className="hidden sm:flex whitespace-nowrap p-1">Zona</th>
-                <th className="flex whitespace-nowrap p-1 w-48">Pareja 1</th>
-                <th className="hidden sm:flex py-2 text-gray-700">Set a</th>
-                <th className="hidden sm:flex py-2 text-gray-700">Set a</th>
-                <th className="flex whitespace-nowrap p-1 w-48">Pareja 2</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fixture.map((partido: Partido, idx: number) => (
-                <tr key={partido.id} className="flex justify-around px-4 py-2 gap-2 border-b border-slate-300">
-                  <td className="flex whitespace-nowrap p-1">{idx}</td>
-                  <td className="flex whitespace-nowrap p-1 ml-8">{partido.categoria}</td>
-                  <td className="hidden sm:flex whitespace-nowrap p-1 ml-4">{partido.zona}</td>
-                  <td className="flex whitespace-nowrap p-1 w-48">{partido.pareja1}</td>
-                  <td className="hidden sm:flex whitespace-nowrap py-2 px-8 border"></td>
-                  <td className="hidden sm:flex whitespace-nowrap py-2 px-8 border"></td>
-                  <td className="flex whitespace-nowrap p-1 w-48">{partido.pareja2}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {partidos.length > 0 ? (
+        <div className="w-full max-w-6xl">
+          <h3 className="text-center text-xl font-semibold my-2">Listado de Partidos</h3>
+          <TablaPartidos />
         </div>
-      )}
+      ) : null}
 
       <div className="flex justify-between gap-4">
         <WizardBtn handleClick={handleBack} back={true} text={"Anterior"} />
-        <WizardBtn handleClick={handleNext} back={false} text={"Siguiente"} />
+        <WizardBtn handleClick={handleNext} back={false} text={"Siguiente"} disabled={nextDisabled} />
       </div>
     </section >
   );

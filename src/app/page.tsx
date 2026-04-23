@@ -1,11 +1,8 @@
 import Link from "next/link";
-import Navbar from "./torneos/crear/ui/Navbar";
 
 export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center h-screen">
-      <Navbar />
-
       <h1 className="font-bold text-5xl">Torneos App</h1>
       <h2 className="font-bold text-2xl">Crea torneos para tu club, segui el siguiente enlace</h2>
 

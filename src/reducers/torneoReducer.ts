@@ -11,6 +11,7 @@ export const initialState: TorneoState = {
   },
   categorias: [],
   parejas: [],
+  parejasCsv: [],
   zonas: [],
   partidos: [],
   ranking: [],
@@ -31,11 +32,22 @@ export const torneoReducer = (state: TorneoState, action: TorneoAction): TorneoS
     case "SET_PAREJAS":
       return { ...state, parejas: action.payload };
 
+    case "SET_PAREJAS_CSV":
+      return { ...state, parejasCsv: action.payload };
+
     case "SET_ZONAS":
       return { ...state, zonas: action.payload };
 
     case "SET_PARTIDOS":
       return { ...state, partidos: action.payload };
+
+    case "UPDATE_PARTIDO":
+      return {
+        ...state,
+        partidos: state.partidos.map((p) =>
+          p.id === action.payload.id ? { ...p, ...action.payload.patch } : p,
+        ),
+      };
 
     case "SET_RANKING":
       return { ...state, ranking: action.payload };

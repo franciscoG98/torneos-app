@@ -4,49 +4,49 @@ import React from "react"
 import { useTorneo } from "@/context/torneoContext";
 import { Button } from "@/components/ui/button"
 
+import { canNavigateToWizardStep } from "@/lib/torneoWizardValidation";
+
 const steps = [
-  {
-    step: 1,
-    name: "PasoDatosTorneo",
-  },
-  {
-    step: 2,
-    name: "PasoCategorias",
-  },
-  {
-    step: 3,
-    name: "PasoZonas",
-  },
-  {
-    step: 4,
-    name: "PasoFixture",
-  },
-]
+  { step: 0, name: "Datos" },
+  { step: 1, name: "Categorías" },
+  { step: 2, name: "Zonas" },
+  { step: 3, name: "Fixture" },
+  { step: 4, name: "Listo" },
+];
 
 const TorneoNavbar = () => {
   const { state, dispatch } = useTorneo();
 
-  console.log('state', state);
-
-  const onChangeStep = (step: number) => {
-    dispatch({ type: "SET_STEP", payload: step });
-  }
+  const onChangeStep = (targetStep: number) => {
+    if (!canNavigateToWizardStep(state.step, targetStep, state)) return;
+    dispatch({ type: "SET_STEP", payload: targetStep });
+  };
 
   return (
-    <nav className="flex justify-between">
-      <div className="flex gap-4">
-        {steps.map((step) => (
+    <nav className="flex justify-between mx-auto w-xl">
+      {steps.map((step) => {
+        const allowed = canNavigateToWizardStep(state.step, step.step, state);
+        return (
           <Button
             key={step.step}
+            variant="outline"
             onClick={() => onChangeStep(step.step)}
-            className={`text-lg ${state.step < step.step ? "text-gray-500" : "text-blue-500"}`}
+            className={`
+            text-md border-none 
+            ${state.step === step.step
+              ? "text-blue-600 font-semibold"
+              : allowed
+                ? "text-gray-600 hover:text-gray-900"
+                : "text-gray-400"
+            }`}
+            disabled={!allowed}
           >
             {step.name}
           </Button>
-        ))}
-      </div>
+        );
+      })}
     </nav>
-  )
-}
+  );
+};
 
 export default TorneoNavbar

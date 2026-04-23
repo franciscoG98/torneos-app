@@ -127,3 +127,39 @@
     @apply font-sans;
     }
 }
+
+/* Impresión / PDF A4 del resumen del torneo (/torneos) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  .torneos-layout > nav {
+    display: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .torneo-a4-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-page-break-before {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .torneo-a4-zona table {
+    font-size: 10pt;
+  }
+}
