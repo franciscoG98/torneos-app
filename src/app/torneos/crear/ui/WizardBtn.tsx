@@ -2,13 +2,20 @@ interface BtnProps {
   handleClick: () => void;
   back: boolean;
   text: string;
+  disabled?: boolean;
 }
 
-const WizardBtn = ({ handleClick, back, text }: BtnProps) => {
+const WizardBtn = ({ handleClick, back, text, disabled }: BtnProps) => {
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className="flex mt-8 mx-auto rounded px-8 py-2 hover:bg-green-600 bg-green-500 text-white font-bold justify-between"
+      disabled={disabled}
+      className={`flex mt-8 mx-auto rounded px-8 py-2 font-bold justify-between text-white ${
+        disabled
+          ? "cursor-not-allowed bg-gray-400 hover:bg-gray-400"
+          : "bg-green-500 hover:bg-green-600"
+      }`}
     >
       {back ? (
         <span className="flex gap-2">

@@ -4,13 +4,14 @@ export const initialState: TorneoState = {
   torneo: {
     nombre: "",
     deporte: "paddle",
-    fechaInicio: new Date(),
-    fechaFin: new Date(),
+    fechaInicio: new Date(0),
+    fechaFin: new Date(0),
     cantidadCanchas: 1,
     estado: "borrador",
   },
   categorias: [],
   parejas: [],
+  parejasCsv: [],
   zonas: [],
   partidos: [],
   ranking: [],
@@ -31,11 +32,22 @@ export const torneoReducer = (state: TorneoState, action: TorneoAction): TorneoS
     case "SET_PAREJAS":
       return { ...state, parejas: action.payload };
 
+    case "SET_PAREJAS_CSV":
+      return { ...state, parejasCsv: action.payload };
+
     case "SET_ZONAS":
       return { ...state, zonas: action.payload };
 
     case "SET_PARTIDOS":
       return { ...state, partidos: action.payload };
+
+    case "UPDATE_PARTIDO":
+      return {
+        ...state,
+        partidos: state.partidos.map((p) =>
+          p.id === action.payload.id ? { ...p, ...action.payload.patch } : p,
+        ),
+      };
 
     case "SET_RANKING":
       return { ...state, ranking: action.payload };

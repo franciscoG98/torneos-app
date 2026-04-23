@@ -5,7 +5,7 @@ import PasoDatosTorneo from "./components/PasoDatosTorneo";
 import PasoCategorias from "./components/PasoCategorias";
 import PasoFixture from "./components/PasoFixture";
 import PasoZonas from "./components/PasoZonas";
-import Link from "next/link";
+import PasoTorneoCreado from "./components/PasoTorneoCreado";
 
 export default function CrearTorneoPage() {
   const { state } = useTorneo();
@@ -21,17 +21,7 @@ export default function CrearTorneoPage() {
       case 3:
         return <PasoFixture />;
       default:
-        return (
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-5xl my-8">¡Torneo creado!</h1>
-            <Link
-              className="underline text-lg text-blue-500 hover:no-underline"
-              href='/torneos'
-            >
-              Inicio
-            </Link>
-          </div>
-        );
+        return <PasoTorneoCreado />;
     }
   }
 

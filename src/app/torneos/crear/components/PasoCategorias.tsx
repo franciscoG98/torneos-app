@@ -3,7 +3,12 @@
 import React, { useState } from "react";
 import { useTorneo } from "@/context/torneoContext";
 import { Categoria } from "@/types/torneo";
+import { isWizardStepComplete } from "@/lib/torneoWizardValidation";
 import WizardBtn from "../ui/WizardBtn";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const PasoCategorias = () => {
   const { state, dispatch } = useTorneo();
@@ -21,6 +26,7 @@ const PasoCategorias = () => {
       id: Date.now().toString(),
       nombre: categoriaNombre,
       tipoPuntaje,
+      zonas: [],
     };
 
     dispatch({
@@ -39,18 +45,21 @@ const PasoCategorias = () => {
   };
 
   const handleNext = () => {
+    if (!isWizardStepComplete(1, state)) return;
     dispatch({ type: "SET_STEP", payload: state.step + 1 });
   };
+
+  const nextDisabled = !isWizardStepComplete(1, state);
 
   return (
     <section className="flex flex-col mx-auto gap-6 w-94">
       <h2 className="text-4xl text-center font-bold mt-8">Crear Categorías</h2>
 
-      <fieldset>
-        <label htmlFor="categoriaNombre" className="block text-sm font-medium text-gray-700">
+      <FieldLabel>
+        <Label htmlFor="categoriaNombre" className="block text-sm font-medium text-gray-700">
           Nombre de la Categoría
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
           name="categoriaNombre"
           id="categoriaNombre"
@@ -58,29 +67,28 @@ const PasoCategorias = () => {
           onChange={(e) => setCategoriaNombre(e.target.value)}
           className="mt-1 p-2 border border-gray-300 rounded-md w-full"
         />
-      </fieldset>
+      </FieldLabel>
 
-      <fieldset>
-        <label htmlFor="tipoPuntaje" className="block text-sm font-medium text-gray-700">
+      <Field className="flex flex-col">
+        <FieldLabel className="block text-sm font-medium text-gray-700">
           Tipo de Puntaje
-        </label>
-        <select
-          name="tipoPuntaje"
-          id="tipoPuntaje"
+        </FieldLabel>
+        <RadioGroup
           value={tipoPuntaje}
-          onChange={(e) => setTipoPuntaje(e.target.value as typeof opcionesPuntaje[number])}
-          className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+          onValueChange={(value) => setTipoPuntaje(value as typeof opcionesPuntaje[number])}
         >
-          {opcionesPuntaje.map((opcion) => (
-            <option key={opcion} value={opcion}>
-              {opcion}
-            </option>
-          ))}
-        </select>
-      </fieldset>
+          <div className="flex flex-col gap-2 mt-1">
+            {opcionesPuntaje.map((opcion) => (
+              <div key={opcion} className="flex items-center gap-3">
+                <RadioGroupItem value={opcion} id={opcion} />
+                <Label htmlFor={opcion}>{opcion}</Label>
+              </div>
+            ))}
+          </div>
+        </RadioGroup>
+      </Field>
 
 
-      {/* <NextBtn handleClick={handleAddCategoria} /> */}
       <div className="mt-4">
         <button
           onClick={handleAddCategoria}
@@ -103,7 +111,12 @@ const PasoCategorias = () => {
 
       <div className="flex justify-between">
         <WizardBtn handleClick={handleBack} back={true} text={"Anterior"} />
-        <WizardBtn handleClick={handleNext} back={false} text={"Siguiente"} />
+        <WizardBtn
+          handleClick={handleNext}
+          back={false}
+          text={"Siguiente"}
+          disabled={nextDisabled}
+        />
       </div>
     </section>
   );
